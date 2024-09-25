@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo 'Install phase has started'
+      - yum update -y
+      - yum install -y java-17-amazon-corretto-devel
+      - yum install -y maven
+    finally:
+      - echo 'Install phase is over'
+  build:
+    commands:
+      - echo 'Build phase has started'
+      - mvn clean install -DskipTests=true
+    finally:
+      - echo 'Build phase is over'
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+
+artifacts:
+  files:
+    - target/gallery-0.0.1-SNAPSHOT.jar
+  discard-paths: yes
