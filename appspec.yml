@@ -1,0 +1,20 @@
+version: 0.0
+os: linux
+
+files:
+  - source: ./gallery-0.0.1-SNAPSHOT.jar
+    destination: /home/ec2-user/apps/gallery
+  - source: ./application-start.sh
+    destination: /home/ec2-user/apps/gallery
+  - source: ./application-stop.sh
+    destination: /home/ec2-user/apps/gallery
+
+hooks:
+  ApplicationStop:
+    - location: application-stop.sh
+      timeout: 60
+      runas: root
+  ApplicationStart:
+    - location: application-start.sh
+      timeout: 180
+      runas: root

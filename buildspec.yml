@@ -22,4 +22,7 @@ phases:
 artifacts:
   files:
     - target/gallery-0.0.1-SNAPSHOT.jar
+    - application-start.sh
+    - application-stop.sh
+    - appspec.yml
   discard-paths: yes
