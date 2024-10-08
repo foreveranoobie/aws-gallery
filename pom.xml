@@ -30,6 +30,13 @@
 	<properties>
 		<java.version>17</java.version>
 	</properties>
+	<distributionManagement>
+		<repository>
+		  <id>gallery-company-gallery-repo</id>
+		  <name>gallery-company-gallery-repo</name>
+		  <url>https://gallery-company-809008733763.d.codeartifact.eu-central-1.amazonaws.com/maven/gallery-repo/</url>
+		</repository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

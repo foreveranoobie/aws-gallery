@@ -9,6 +9,9 @@ phases:
       - yum install -y maven
     finally:
       - echo 'Install phase is over'
+  pre_build:
+    commands:
+      - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain gallery-company --domain-owner 809008733763 --region eu-central-1 --query authorizationToken --output text`
   build:
     commands:
       - echo 'Build phase has started'
