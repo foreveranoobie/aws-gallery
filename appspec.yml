@@ -8,13 +8,15 @@ files:
     destination: /home/ec2-user/apps/gallery
   - source: ./application-stop.sh
     destination: /home/ec2-user/apps/gallery
+  - source: ./amazon-cloudwatch-agent.json
+    destination: /home/ec2-user/apps/gallery
 file_exists_behavior: OVERWRITE
 
 hooks:
   ApplicationStop:
     - location: application-stop.sh
       timeout: 60
-      runas: root
+      runas: ec2-user
   ApplicationStart:
     - location: application-start.sh
       timeout: 180
@@ -22,4 +24,4 @@ hooks:
   ValidateService:
     - location: health_check.sh
       timeout: 180
-      runas: root
+      runas: ec2-user
