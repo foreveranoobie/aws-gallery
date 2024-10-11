@@ -8,6 +8,7 @@ files:
     destination: /home/ec2-user/apps/gallery
   - source: ./application-stop.sh
     destination: /home/ec2-user/apps/gallery
+file_exists_behavior: OVERWRITE
 
 hooks:
   ApplicationStop:
@@ -16,5 +17,9 @@ hooks:
       runas: root
   ApplicationStart:
     - location: application-start.sh
+      timeout: 180
+      runas: root
+  ValidateService:
+    - location: health_check.sh
       timeout: 180
       runas: root
