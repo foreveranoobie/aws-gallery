@@ -1,9 +1,11 @@
 #!/bin/bash
 
-if [ "$APP_PROFILE" == "qa" ]
+if [ "$DEPLOYMENT_GROUP_NAME" == "Gallery-QA" ]
 then
-    nohup java -jar -Dspring-boot.run.profiles=qa /home/ec2-user/apps/gallery/gallery-0.0.1-SNAPSHOT.jar > /dev/null 2> /dev/null < /dev/null &
+    echo 'launching app with QA profile'
+    nohup java -jar -Dspring.profiles.active=qa /home/ec2-user/apps/gallery/gallery-0.0.1-SNAPSHOT.jar > /home/ec2-user/apps/gallery/out1 2> /home/ec2-user/apps/gallery/out2 < /dev/null &
 else
-    nohup java -jar -Dspring-boot.run.profiles=dev /home/ec2-user/apps/gallery/gallery-0.0.1-SNAPSHOT.jar > /dev/null 2> /dev/null < /dev/null &
+    echo 'launching app with dev profile'
+    nohup java -jar -Dspring.profiles.active=dev /home/ec2-user/apps/gallery/gallery-0.0.1-SNAPSHOT.jar > /home/ec2-user/apps/gallery/out1 2> /home/ec2-user/apps/gallery/out2 < /dev/null &
 fi
 exit 0
