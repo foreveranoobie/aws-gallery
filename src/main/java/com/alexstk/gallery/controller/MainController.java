@@ -9,9 +9,11 @@ public class MainController {
 
     @Value("${spring.profiles.active}")
     private String profileName;
+    @Value("${admin.name}")
+    private String envAdminName;
 
     @GetMapping("/health")
     public String getHealth(){
-        return String.format("Hello from EC2 on %s's profile", profileName);
+        return String.format("Hello from EC2 on %s's profile. Your admin is %s", profileName, envAdminName);
     }
 }
