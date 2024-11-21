@@ -1,0 +1,31 @@
+Parameters:
+  CidrBlockValue:
+    Type: String
+    Description: Enter the VPC IPv4 network mask (ex. 0.0.0.0/32)
+  FirstSubnetCidr:
+    Type: String
+    Description: Enter the IPv4 CIDR of the first subnet
+  SecondSubnetCidr:
+    Type: String
+    Description: Enter the IPv4 CIDR of the second subnet
+  ThirdSubnetCidr:
+    Type: String
+    Description: Enter the IPv4 CIDR of the third subnet
+Resources:
+  MyVPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cf-templates-b9kf8t9ylv7o-eu-central-1.s3.eu-central-1.amazonaws.com/cf-vpc.yaml
+      Parameters:
+        CidrBlockValue: !Ref CidrBlockValue
+        FirstSubnetCidr: !Ref FirstSubnetCidr
+        SecondSubnetCidr: !Ref SecondSubnetCidr
+        ThirdSubnetCidr: !Ref ThirdSubnetCidr
+  MyEC2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cf-templates-b9kf8t9ylv7o-eu-central-1.s3.eu-central-1.amazonaws.com/cf-ec2.yaml
+      Parameters:
+        SubnetIdVal: !GetAtt MyVPCStack.Outputs.SubnetIdVal
+        VpcId: !GetAtt MyVPCStack.Outputs.VpcId
+    DependsOn: MyVPCStack

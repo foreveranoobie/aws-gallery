@@ -1,0 +1,86 @@
+Parameters:
+  CidrBlockValue:
+    Type: String
+  FirstSubnetCidr:
+    Type: String
+  SecondSubnetCidr:
+    Type: String
+  ThirdSubnetCidr:
+    Type: String
+Outputs:
+  SubnetIdVal:
+    Value: !Ref CloudFormationFirstSubnet
+  VpcId:
+    Value: !GetAtt CloudFormationVPC.VpcId
+Resources:
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: "CF-Gateway"
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref CloudFormationVPC
+
+  CloudFormationVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref CidrBlockValue
+      Tags:
+        - Key: "Name"
+          Value: "CloudFormation-VPC"
+
+  CloudFormationFirstSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      MapPublicIpOnLaunch: true
+      VpcId: !GetAtt CloudFormationVPC.VpcId
+      CidrBlock: !Ref FirstSubnetCidr
+      Tags:
+        - Key: "Name"
+          Value: "CloudFormation-First-Subnet"
+          
+  CloudFormationSecondSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      MapPublicIpOnLaunch: true
+      VpcId: !GetAtt CloudFormationVPC.VpcId
+      CidrBlock: !Ref SecondSubnetCidr
+      Tags:
+        - Key: "Name"
+          Value: "CloudFormation-Second-Subnet"
+
+  CloudFormationThirdSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !GetAtt CloudFormationVPC.VpcId
+      CidrBlock: !Ref ThirdSubnetCidr
+      Tags:
+        - Key: "Name"
+          Value: "CloudFormation-Third-Subnet"
+  
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref CloudFormationVPC
+      Tags:
+        - Key: "Name"
+          Value: "CF-Public-Route-Table"
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  FirstSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref CloudFormationFirstSubnet

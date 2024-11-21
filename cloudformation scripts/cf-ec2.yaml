@@ -1,0 +1,97 @@
+Parameters:
+  SubnetIdVal:
+    Type: AWS::EC2::Subnet::Id
+  VpcId:
+    Type: String
+Resources:
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - autoscaling:Describe*
+                  - cloudformation:Describe*
+                  - cloudformation:GetTemplate
+                  - s3:Get*
+                  - s3:List*
+                  - s3:Describe*
+                  - s3-object-lambda:Get*
+                  - s3-object-lambda:List*
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                  - logs:DescribeLogGroups
+                  - ssm:GetParametersByPath
+                  - secretsmanager:GetSecretValue
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: '*'
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref InstanceRole
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcId
+      GroupName: CF-Security-Group
+      GroupDescription: Allows incoming TCP requests for ports 8080, 80, 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+  CloudFormatedInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      Tags:
+        - Key: Name
+          Value: CloudFormation-Instance
+        - Key: CodeDeployTag
+          Value: CFInstance
+      KeyName: Gallery-Instance
+      ImageId: ami-0eddb4a4e7d846d6f
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !GetAtt InstanceSecurityGroup.GroupId
+      SubnetId: !Ref SubnetIdVal
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          # install java and ruby (for codedeploy agent)
+          sudo yum update
+          sudo yum install -y java-17-amazon-corretto-headless
+          sudo yum install -y ruby
+          # install codedeploy agent
+          wget "https://aws-codedeploy-eu-west-3.s3.eu-west-3.amazonaws.com/latest/install"
+          chmod +x ./install
+          sudo ./install auto
+          # create apps dir
+          echo Creating apps dir
+          echo "sudo mkdir -p /home/ec2-user/apps/gallery" >> /etc/profile.d/sync_bucket.sh
+          echo Created apps dir
