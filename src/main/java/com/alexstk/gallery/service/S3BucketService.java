@@ -1,6 +1,6 @@
 package com.alexstk.gallery.service;
 
-import com.alexstk.gallery.api.S3ObjectInfoResponse;
+import com.alexstk.gallery.api.s3.S3ObjectInfoResponse;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.model.Bucket;
 

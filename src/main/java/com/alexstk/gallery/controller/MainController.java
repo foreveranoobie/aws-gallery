@@ -1,7 +1,7 @@
 package com.alexstk.gallery.controller;
 
-import com.alexstk.gallery.api.S3ObjectInfoResponse;
-import com.alexstk.gallery.api.S3ObjectRemovedResponse;
+import com.alexstk.gallery.api.s3.S3ObjectInfoResponse;
+import com.alexstk.gallery.api.s3.S3ObjectRemovedResponse;
 import com.alexstk.gallery.service.S3BucketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

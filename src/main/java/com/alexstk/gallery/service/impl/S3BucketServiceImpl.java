@@ -1,6 +1,6 @@
 package com.alexstk.gallery.service.impl;
 
-import com.alexstk.gallery.api.S3ObjectInfoResponse;
+import com.alexstk.gallery.api.s3.S3ObjectInfoResponse;
 import com.alexstk.gallery.service.S3BucketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

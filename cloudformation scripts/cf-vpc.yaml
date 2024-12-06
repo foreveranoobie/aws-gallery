@@ -30,6 +30,8 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref CidrBlockValue
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
       Tags:
         - Key: "Name"
           Value: "CloudFormation-VPC"
@@ -40,6 +42,7 @@ Resources:
       MapPublicIpOnLaunch: true
       VpcId: !GetAtt CloudFormationVPC.VpcId
       CidrBlock: !Ref FirstSubnetCidr
+      AvailabilityZone: eu-central-1a
       Tags:
         - Key: "Name"
           Value: "CloudFormation-First-Subnet"
@@ -50,6 +53,7 @@ Resources:
       MapPublicIpOnLaunch: true
       VpcId: !GetAtt CloudFormationVPC.VpcId
       CidrBlock: !Ref SecondSubnetCidr
+      AvailabilityZone: eu-central-1b
       Tags:
         - Key: "Name"
           Value: "CloudFormation-Second-Subnet"
@@ -59,6 +63,7 @@ Resources:
     Properties:
       VpcId: !GetAtt CloudFormationVPC.VpcId
       CidrBlock: !Ref ThirdSubnetCidr
+      AvailabilityZone: eu-central-1c
       Tags:
         - Key: "Name"
           Value: "CloudFormation-Third-Subnet"

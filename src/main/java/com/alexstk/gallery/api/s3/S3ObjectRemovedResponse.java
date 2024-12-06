@@ -1,4 +1,4 @@
-package com.alexstk.gallery.api;
+package com.alexstk.gallery.api.s3;
 
 public class S3ObjectRemovedResponse {
     private String key;

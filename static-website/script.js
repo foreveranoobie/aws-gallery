@@ -3,7 +3,7 @@ $(document).ready(function () {
 
   let allKeys = [];
 
-  get("http://localhost:8080/s3/images", function (data) {
+  get("http://54.93.176.228:8080/s3/images", function (data) {
     data.forEach(element => {
       const imageObj = {
         key: element.key,
@@ -114,7 +114,7 @@ $(document).ready(function () {
 
   $("#upload-file-input").on("change", function () {
     const file = $(this).prop("files")[0];
-    const url = "http://localhost:8080/s3/upload";
+    const url = "http://54.93.176.228:8080/s3/upload";
     post(url, "multipart/form-data", file, function (data) {
       showSuccessUploadNotification(file.name);
       const template = $("#image-key-template").html();
@@ -126,7 +126,7 @@ $(document).ready(function () {
   function deleteImage() {
     const parent = $(this).closest(".image-card");
     const dataToSend = parent[0] ? parent[0].id : '';
-    del("http://localhost:8080/s3/" + dataToSend, function (data) {
+    del("http://54.93.176.228:8080/s3/" + dataToSend, function (data) {
       parent.addClass("delete-animation");
       setTimeout(function () {
         parent.remove();
