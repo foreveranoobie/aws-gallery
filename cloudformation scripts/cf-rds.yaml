@@ -1,0 +1,101 @@
+Parameters:
+  EnvironmentType:
+    Description: Choose which environment should be used
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+    Default: dev
+  TagValue:
+    Description: Tag Name value for RDS
+    Type: "String"
+    Default: "Gallery-CF-DB"
+  DBName:
+    Description: PostgeSQL database name
+    Type: "String"
+    Default: "gallery"
+  DBUsername:
+    Description: PostgreSQL username
+    Type: "String"
+    Default: "postgres"
+  DBPassword:
+    Description: PostgreSQL password
+    Type: "String"
+    Default: "qwerty123"
+  VpcId:
+    Description: The VPC ID
+    Type: AWS::EC2::VPC::Id
+  SubnetId1:
+    Description: The ID of first subnet
+    Type: AWS::EC2::Subnet::Id
+  SubnetId2:
+    Description: The ID of second subnet
+    Type: AWS::EC2::Subnet::Id
+  SubnetId3:
+      Description: The ID of third subnet
+      Type: AWS::EC2::Subnet::Id
+
+Resources:
+  SubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupName: "rds-subnet-group"
+      DBSubnetGroupDescription: "RDS subnet group"
+      SubnetIds:
+        - !Ref SubnetId1
+        - !Ref SubnetId2
+        - !Ref SubnetId3
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Join ["-", [rds-ec2-sg, !Ref EnvironmentType]]
+      GroupDescription: "Allow RDS traffic"
+      VpcId: !Ref VpcId
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: "0.0.0.0/0"
+      SecurityGroupIngress:
+        - IpProtocol: "-1"
+          CidrIp: "0.0.0.0/0"
+
+  Instance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBSubnetGroupName: !Ref SubnetGroup
+      VPCSecurityGroups:
+        - !Ref InstanceSecurityGroup
+      DBInstanceClass: db.t4g.micro
+      AllocatedStorage: "5"
+      Engine: postgres
+      EngineVersion: "17.2"
+      DBName: !Ref DBName
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      PubliclyAccessible: true
+      AvailabilityZone: eu-central-1a
+      Tags:
+        - Key: Name
+          Value: !Ref TagValue
+    UpdateReplacePolicy: Snapshot
+    DeletionPolicy: Delete
+  
+  DatabaseURLParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /app/gallery_${EnvironmentType}/rds.db.host
+      Type: String
+      Value: !Sub jdbc:postgresql://${Instance.Endpoint.Address}:${Instance.Endpoint.Port}/${DBName}
+
+  DatabaseUsernameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /app/gallery_${EnvironmentType}/rds.db.username
+      Type: String
+      Value: !Ref DBUsername
+
+  DatabasePasswordParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /app/gallery_${EnvironmentType}/rds.db.password
+      Type: String
+      Value: !Ref DBPassword
