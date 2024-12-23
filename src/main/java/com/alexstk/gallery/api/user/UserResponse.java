@@ -10,19 +10,8 @@ import java.util.Objects;
 public final class UserResponse {
     private final int id;
     private final String name;
+    private final String password;
     private final String role;
-
-    public int id() {
-        return id;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public String role() {
-        return role;
-    }
 
     @Override
     public boolean equals(Object obj) {

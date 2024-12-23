@@ -1,48 +1,57 @@
 package com.alexstk.gallery.service.impl;
 
 import com.alexstk.gallery.dto.UserDto;
-import com.alexstk.gallery.dto.UserGroupDto;
 import com.alexstk.gallery.entity.User;
 import com.alexstk.gallery.repository.UserRepository;
 import com.alexstk.gallery.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
+@Service
 public class UserServiceImpl implements UserService {
-
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository repository;
+
+    @Override
+    public UserDto getUser(int id) {
+        User user = repository.findById(id);
+        UserDto userDto = new UserDto(user.getId(), user.getLogin(), user.getPassword(), String.valueOf(user.getRoleId()));
+        return userDto;
+    }
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(user ->
-                        new UserDto(user.getId(), user.getName(), user.getPassword(), UserGroupDto.valueOf(user.getRole().getRoleType().name())))
-                .collect(Collectors.toList());
+        List<UserDto> userDtos = repository.list().stream().map(user -> new UserDto(user.getId(), user.getLogin(), user.getPassword(), String.valueOf(user.getRoleId()))).collect(
+                Collectors.toList());
+        return userDtos;
     }
 
     @Override
-    public UserDto getUserById(int id) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return new UserDto(user.getId(), user.getName(), user.getPassword(), UserGroupDto.valueOf(user.getRole().getRoleType().name()));
-        }
-        return null;
+    public void saveUser(UserDto userDto) {
+
+        User user = new User(userDto.getId(), userDto.getLogin(), userDto.getPassword(), Integer.valueOf(userDto.getRole()));
+        repository.persist(user);
     }
 
     @Override
-    public UserDto getUserByName(String name) {
-        Optional<User> userOptional = userRepository.findOneByName(name);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return new UserDto(user.getId(), user.getName(), user.getPassword(), UserGroupDto.valueOf(user.getRole().getRoleType().name()));
+    public void deleteUser(int id) {
+        repository.remove(id);
+    }
+
+    @Override
+    public void createTable(String password){
+        if("user".equals(password)){
+            repository.createTable();
         }
-        return null;
+    }
+
+    @Override
+    public void deleteTable(String password){
+        if("user".equals(password)){
+            repository.deleteTable();
+        }
     }
 }

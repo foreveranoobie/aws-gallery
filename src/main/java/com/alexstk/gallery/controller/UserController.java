@@ -4,8 +4,6 @@ import com.alexstk.gallery.api.user.UserResponse;
 import com.alexstk.gallery.dto.UserDto;
 import com.alexstk.gallery.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,23 +11,48 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping(path = "/user")
 public class UserController {
     @Autowired
-    private UserService userService;
+    private UserService service;
+
+    @GetMapping(path = "/{id}")
+    public UserResponse getById(@PathVariable int id) {
+        UserDto userDto = service.getUser(id);
+        return new UserResponse(userDto.getId(), userDto.getLogin(), userDto.getPassword(), userDto.getRole());
+    }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers(){
-        List<UserResponse> users = userService.getAllUsers().stream()
-                .map(user -> new UserResponse(user.id(), user.name(), user.group().name())).collect(Collectors.toList());
-        return new ResponseEntity<>(users, HttpStatus.OK);
+    public List<UserResponse> getAll() {
+        List<UserResponse> users = service.getAllUsers()
+                .stream()
+                .map(userDto -> new UserResponse(userDto.getId(), userDto.getLogin(), userDto.getPassword(),
+                        userDto.getRole()))
+                .collect(Collectors.toList());
+        return users;
     }
 
-    @GetMapping(path = "/{name}")
-    public ResponseEntity<UserResponse> getByName(@PathVariable String name){
-        UserDto userDto = userService.getUserByName(name);
-        UserResponse userResponse = new UserResponse(userDto.id(), userDto.name(), userDto.group().name());
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    @PostMapping
+    public ResponseEntity create(@RequestBody UserDto createDto) {
+        service.saveUser(createDto);
+        return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable int id) {
+        service.deleteUser(id);
+        return ResponseEntity.accepted().build();
+    }
+
+    @DeleteMapping("/table/{password}")
+    public ResponseEntity deleteTable(@PathVariable String password){
+        service.deleteTable(password);
+        return ResponseEntity.status(410).build();
+    }
+
+    @PutMapping("/table/{password}")
+    public ResponseEntity createTable(@PathVariable String password){
+        service.createTable(password);
+        return ResponseEntity.status(201).build();
+    }
 }

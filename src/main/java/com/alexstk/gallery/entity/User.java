@@ -1,25 +1,37 @@
 package com.alexstk.gallery.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
-@Entity
-@Table(name = "user", schema = "public")
+@DynamoDbBean
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
 public class User {
-    @Id
     private int id;
-
-    @Column
-    private String name;
-
-    @Column
+    private String login;
     private String password;
+    private int roleId;
 
-    @OneToOne
-    @JoinColumn(name = "role", referencedColumnName = "id")
-    private UserRole role;
+    @DynamoDbPartitionKey
+    public int getId() {
+        return id;
+    }
+
+    @DynamoDbSortKey
+    public String getLogin() {
+        return login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public int getRoleId() {
+        return roleId;
+    }
 }
